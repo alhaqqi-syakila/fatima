@@ -13,7 +13,7 @@ body {
 }
 
 header {
-    background-image: url('https://ik.imagekit.io/alhaqqisyakila/images/pepper-face-plant-small-pot.jpg?updatedAt=1737171571506');
+    background-image: url('https://ik.imagekit.io/alhaqqisyakila/images/calathea-medallion-plant-white-pot.jpg?updatedAt=1737171609987');
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;
@@ -94,6 +94,11 @@ main {
 
 .product p {
     margin-bottom: 2rem;
+}
+
+img {
+    height: 100px;
+    object-fit: cover;
 }
 
 img:hover {
@@ -195,4 +200,126 @@ footer {
     border-top: 1px solid #ffce0a;
     padding-top: 1rem;
     font-size: 0.9rem;
+}
+
+@media (min-width: 768px) {
+    header,main, footer {
+        padding: 2rem 10rem;
+    }
+
+    header {
+        background-position: bottom;
+        background-color: #1F473E;
+    }
+
+    img {
+        width: auto;
+        height: 200px;
+    }
+
+    nav {
+        margin: 1rem 0;
+    }
+
+    .logo-name {
+        font-size: 1.8rem;
+    }
+
+    .btn-nav {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .title {
+        font-size: 3rem;
+        margin: 3rem 0 5rem;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .buy-btn {
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+        margin: 3rem 0 7rem;
+    }
+
+    .product img {
+        width: 150px;
+    }
+
+    footer {
+        padding: 3rem 2rem;
+    }
+
+    .footer-content h3 {
+        font-size: 2rem;
+    }
+
+    .footer-content p {
+        font-size: 1.2rem;
+    }
+
+    .footer-contact li {
+        font-size: 1.2rem;
+    }
+
+    .social-icons a {
+        font-size: 2rem;
+        margin: 0 1rem;
+    }
+
+    .footer-bottom {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    header,main,footer {
+        padding: 1rem 15rem;
+    }
+
+    header {
+        margin: 0rem;
+    }
+
+    img {
+        width: auto;
+        height: 250px;
+    }
+    
+
+    .title {
+        font-size: 3rem;
+    }
+
+    .buy-btn {
+        font-size: 1.5rem;
+    }
+
+    .product img {
+        width: 200px;
+    }
+
+    .footer-content h3 {
+        font-size: 2rem;
+    }
+
+    .footer-content p {
+        font-size: 1.2rem;
+    }
+
+    .footer-contact li {
+        font-size: 1.2rem;
+    }
+
+    .social-icons a {
+        font-size: 2rem;
+    }
+
+    .footer-bottom {
+        font-size: 1    rem;
+    }
 }
