@@ -13,7 +13,7 @@ body {
 }
 
 header {
-    background-image: url('/images/bg3.jpg');
+    background-image: url('https://ik.imagekit.io/alhaqqisyakila/images/bg3.jpg?updatedAt=1737170012870');
     background-repeat: no-repeat;
     background-size: cover;
     position: relative;
@@ -101,30 +101,41 @@ img:hover {
     box-shadow: 1px 1px 10px #fff0b4;
 }
 
-img:nth-child(1){
+img:nth-child(2){
     border-radius: 1rem 0 0 1rem ;
 }
 
-img:nth-child(2){
-    border-radius: 0 0 1rem 1rem ;
-}
-
 img:nth-child(3){
-    border-radius: 0 1rem 0rem 0rem ;
+    border-radius: 1rem 1rem 1rem 0rem ;
 }
 
 img:nth-child(4){
-    border-radius: 1rem 1rem 0rem 1rem ;
+    border-radius: 0 1rem 0rem 0rem ;
 }
 
 img:nth-child(5){
-    border-radius: 0 1rem 1rem 0rem ;
+    border-radius: 1rem 1rem 0rem 1rem ;
 }
 
 img:nth-child(6){
+    border-radius: 0 1rem 1rem 0rem ;
+}
+
+img:nth-child(7){
     border-radius: 0 0 1rem 0rem ;
 }
 
+img:nth-child(8){
+    border-radius: 1rem 0rem 1rem 0rem ;
+}
+
+img:nth-child(9){
+    border-radius: 1rem 0rem 0rem 1rem ;
+}
+
+img:nth-child(10){
+    border-radius: 0rem 1rem 1rem 0rem ;
+}
 
 footer {
     background-color: #1F473E;
