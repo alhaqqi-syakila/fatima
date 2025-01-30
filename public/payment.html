@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Fatima Collection</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/payment.css">
+    <!-- Midtrans Snap JS -->
+    <script type="text/javascript" 
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="<CLIENT_KEY_MIDTRANS>"></script>
+</head>
+<body>
+    <header>
+        <!-- Navbar sama seperti halaman sebelumnya -->
+    </header>
+
+    <main class="payment-container">
+        <div class="payment-details">
+            <h1>Payment Method</h1>
+            <div class="transaction-summary">
+                <h3>Order Summary</h3>
+                <div id="transactionDetails">
+                    <!-- Detail transaksi akan diisi oleh JavaScript -->
+                </div>
+            </div>
+            
+            <div class="payment-methods">
+                <button class="pay-btn" id="bankTransferBtn">
+                    <i class="fa-solid fa-building-columns"></i>
+                    Bank Transfer
+                </button>
+                
+                <button class="pay-btn" id="ewalletBtn">
+                    <i class="fa-solid fa-wallet"></i>
+                    E-Wallet
+                </button>
+                
+                <button class="pay-btn" id="creditCardBtn">
+                    <i class="fa-solid fa-credit-card"></i>
+                    Credit Card
+                </button>
+            </div>
+            
+            <div id="snap-container" style="display:none;"></div>
+        </div>
+    </main>
+
+    <script>
+        // Ambil data transaksi dari localStorage
+        const transactionData = JSON.parse(localStorage.getItem('transactionData'));
+        
+        // Tampilkan detail transaksi
+        const transactionDetails = document.getElementById('transactionDetails');
+        transactionDetails.innerHTML = `
+            <p>Produk: ${transactionData.productId}</p>
+            <p>Jumlah: ${transactionData.quantity}</p>
+            <p>Total: Rp ${(transactionData.quantity * transactionData.productPrice).toLocaleString()}</p>
+        `;
+
+        // Fungsi untuk memproses pembayaran
+        async function processPayment(paymentMethod) {
+            try {
+                const response = await fetch('/create-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        transactionData: transactionData,
+                        paymentMethod: paymentMethod
+                    })
+                });
+
+                const paymentToken = await response.json();
+                
+                // Tampilkan Snap payment form
+                snap.pay(paymentToken.token, {
+                    onSuccess: function(result) {
+                        alert('Payment success!');
+                        window.location.href = 'success.html';
+                    },
+                    onPending: function(result) {
+                        alert('Waiting for payment confirmation');
+                    },
+                    onError: function(result) {
+                        alert('Payment failed');
+                    }
+                });
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Error processing payment');
+            }
+        }
+
+        // Event listeners untuk tombol pembayaran
+        document.getElementById('bankTransferBtn').addEventListener('click', () => processPayment('bank_transfer'));
+        document.getElementById('ewalletBtn').addEventListener('click', () => processPayment('gopay'));
+        document.getElementById('creditCardBtn').addEventListener('click', () => processPayment('credit_card'));
+    </script>
+</body>
+</html>
