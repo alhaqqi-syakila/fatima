@@ -16,11 +16,16 @@ app.use(bodyParser.json()); // Untuk parsing JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Untuk parsing form data
 
 app.use(session({
-  secret: 'your_secret_key',  // Ganti dengan secret key yang aman
+  secret: 'alamak', // Ganti dengan secret yang aman
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false }  // Set `true` jika menggunakan HTTPS
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Gunakan secure cookie di production
+    maxAge: 1000 * 60 * 60 * 24 // 1 hari
+  }
 }));
+
 
 // Database connection pool
 const pool = mysql.createPool({
