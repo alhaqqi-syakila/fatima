@@ -2,15 +2,13 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const path = require('path')
+const path = require('path');
 const mysql = require("mysql2/promise");
 const cors = require('cors'); // Tambahkan CORS
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
 
 // Middleware
 app.use(cors()); // Aktifkan CORS
@@ -40,7 +38,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Route untuk root path
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname,"public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Register endpoint
@@ -88,7 +86,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
 // Logout endpoint
 app.post("/logout", (req, res) => {
   req.session.destroy(err => {
@@ -99,8 +96,7 @@ app.post("/logout", (req, res) => {
   });
 });
 
-
-// Endpoint to fetch all products
+// Endpoint untuk fetch produk
 app.get("/products", async (req, res) => {
   try {
     const [results] = await pool.query("SELECT * FROM products");
@@ -111,7 +107,7 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// Endpoint to fetch product by ID
+// Endpoint untuk fetch product by ID
 app.get("/product/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -175,13 +171,10 @@ app.delete("/product/:id", async (req, res) => {
   }
 });
 
+// Cek session
 app.get("/check-session", (req, res) => {
   console.log("Session Data:", req.session);
   res.json({ session: req.session });
 });
 
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = app; // Ekspor app agar bisa digunakan oleh Vercel
