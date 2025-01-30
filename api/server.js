@@ -16,15 +16,16 @@ app.use(bodyParser.json()); // Untuk parsing JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Untuk parsing form data
 
 app.use(session({
-  secret: 'alamak', // Ganti dengan secret yang aman
+  secret: 'alamak', 
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Gunakan secure cookie di production
+    secure: false, // set false untuk development (non-HTTPS)
     maxAge: 1000 * 60 * 60 * 24 // 1 hari
   }
 }));
+
 
 
 // Database connection pool
@@ -38,6 +39,16 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+pool.getConnection()
+  .then((connection) => {
+    console.log('Connected to DB!');
+    connection.release();
+  })
+  .catch((error) => {
+    console.error('Error connecting to DB:', error);
+  });
+
+
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "../public")));
 
@@ -49,12 +60,13 @@ app.get("/", (req, res) => {
 // Register endpoint
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
+  console.log(`Registering user: ${username}`); // Tambahkan log
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword]);
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error(err);
+    console.error(err); // Log error lebih rinci
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -62,34 +74,32 @@ app.post("/register", async (req, res) => {
 // Login endpoint
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-
+  console.log(`Attempting login for: ${username}`); // Tambahkan log
   try {
-      const [users] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);
+    const [users] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);
 
-      if (users.length === 0) {
-          return res.status(401).json({ error: "Invalid credentials" });
-      }
+    if (users.length === 0) {
+      console.log('User not found'); // Log user tidak ditemukan
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
-      const user = users[0];
-      const passwordMatch = await bcrypt.compare(password, user.password);
+    const user = users[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
-      if (!passwordMatch) {
-          return res.status(401).json({ error: "Invalid credentials" });
-      }
+    if (!passwordMatch) {
+      console.log('Password does not match'); // Log password tidak cocok
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
-      // Pastikan `req.session` sudah tersedia sebelum menggunakannya
-      if (!req.session) {
-          return res.status(500).json({ error: "Session not initialized" });
-      }
-
-      req.session.user = { id: user.id, username: user.username };
-      res.json({ message: "Login successful" });
+    req.session.user = { id: user.id, username: user.username };
+    res.json({ message: "Login successful" });
 
   } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
+    console.error(err); // Log error lebih rinci
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Logout endpoint
 app.post("/logout", (req, res) => {
