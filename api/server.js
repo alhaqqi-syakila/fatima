@@ -4,14 +4,20 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 const mysql = require("mysql2/promise");
-const cors = require('cors'); // Tambahkan CORS
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors()); // Aktifkan CORS
+app.use(cors(
+  {
+    origin: ["https://flotist-app.vercel.app/"],
+    methods: ["POST","GET"],
+    credentials: true
+  }
+)); // Aktifkan CORS
 app.use(bodyParser.json()); // Untuk parsing JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Untuk parsing form data
 
@@ -30,24 +36,14 @@ app.use(session({
 
 // Database connection pool
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "fatima_collection",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
-
-pool.getConnection()
-  .then((connection) => {
-    console.log('Connected to DB!');
-    connection.release();
-  })
-  .catch((error) => {
-    console.error('Error connecting to DB:', error);
-  });
-
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "../public")));
@@ -191,5 +187,11 @@ app.get("/check-session", (req, res) => {
   console.log("Session Data:", req.session);
   res.json({ session: req.session });
 });
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
 
 module.exports = app; // Ekspor app agar bisa digunakan oleh Vercel
