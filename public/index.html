@@ -27,34 +27,6 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('error-message');
-
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert("Login berhasil!");
-                    window.location.href = "home.html"; // Redirect ke dashboard atau halaman lain
-                } else {
-                    errorMessage.textContent = data.error || "Login gagal. Periksa kembali username dan password.";
-                }
-            } catch (error) {
-                errorMessage.textContent = "Terjadi kesalahan, coba lagi nanti.";
-                console.error('Error:', error);
-            }
-        });
-    </script>
+    <script></script>
 </body>
 </html>

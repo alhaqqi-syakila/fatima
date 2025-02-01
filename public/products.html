@@ -29,53 +29,6 @@
         </div>
     </main>
 
-    <script>
-        let productsData = [];
-
-        // Fetch produk dari API
-        fetch('http://localhost:3000/products')
-            .then(response => response.json())
-            .then(products => {
-                productsData = products;
-                displayProducts(products);
-            });
-
-        function displayProducts(products) {
-            const productList = document.getElementById('productList');
-            productList.innerHTML = '';
-            
-            products.forEach(product => {
-                const productCard = `
-                    <div class="product-card">
-                        <img src="${product.image_url}" alt="${product.name}" class="product-image">
-                        <div class="product-details">
-                            <h3>${product.name}</h3>
-                            <p class="product-description">${product.description}</p>
-                            <h5 class="product-price">Rp ${product.price.toLocaleString()}</h5>
-                            <button class="buy-btn" data-id="${product.id}">Beli</button>
-                        </div>
-                    </div>
-                `;
-                productList.innerHTML += productCard;
-            });
-
-            document.querySelectorAll('.buy-btn').forEach(button => {
-                button.addEventListener('click', () => {
-                    const productId = button.dataset.id;
-                    localStorage.setItem('selectedProduct', productId);
-                    window.location.href = 'checkout.html';
-                });
-            });
-        }
-
-        // Fitur pencarian
-        document.getElementById('searchInput').addEventListener('input', function () {
-            const searchTerm = this.value.toLowerCase();
-            const filteredProducts = productsData.filter(product =>
-                product.name.toLowerCase().includes(searchTerm)
-            );
-            displayProducts(filteredProducts);
-        });
-    </script>
+    <script src="./js/products.js"></script>
 </body>
 </html>

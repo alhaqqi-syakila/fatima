@@ -5,34 +5,48 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const mysql = require("mysql2/promise");
 const cors = require('cors');
+const morgan = require('morgan');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Setup CORS
+app.use(cors({
+  origin: ["https://flotist.vercel.app"],  // Ganti dengan domain frontend kamu
+  methods: ["POST", "GET"],
+  credentials: true
+}));
+
+// Setup Helmet for security
+app.use(helmet());
+
+// Rate Limiting (untuk mencegah serangan brute force)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 100 // Batasi setiap IP hanya bisa mengakses 100 request per jendela
+});
+app.use(limiter);
+
 // Middleware
-app.use(cors(
-  {
-    origin: ["https://flotist-app.vercel.app/"],
-    methods: ["POST","GET"],
-    credentials: true
-  }
-)); // Aktifkan CORS
-app.use(bodyParser.json()); // Untuk parsing JSON
-app.use(bodyParser.urlencoded({ extended: true })); // Untuk parsing form data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Setup logging dengan Morgan
+app.use(morgan('combined'));
 
 app.use(session({
-  secret: 'alamak', 
+  secret: process.env.SESSION_SECRET || 'alamak',
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // set false untuk development (non-HTTPS)
+    secure: process.env.NODE_ENV === 'production',  // Set ke true di produksi (HTTPS)
     maxAge: 1000 * 60 * 60 * 24 // 1 hari
   }
 }));
-
-
 
 // Database connection pool
 const pool = mysql.createPool({
@@ -57,13 +71,12 @@ app.get("/", (req, res) => {
 // Register endpoint
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
-  console.log(`Registering user: ${username}`); // Tambahkan log
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     await pool.query("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword]);
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error(err); // Log error lebih rinci
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
@@ -71,12 +84,10 @@ app.post("/register", async (req, res) => {
 // Login endpoint
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  console.log(`Attempting login for: ${username}`); // Tambahkan log
   try {
     const [users] = await pool.query("SELECT * FROM users WHERE username = ?", [username]);
 
     if (users.length === 0) {
-      console.log('User not found'); // Log user tidak ditemukan
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
@@ -84,19 +95,16 @@ app.post("/login", async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      console.log('Password does not match'); // Log password tidak cocok
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     req.session.user = { id: user.id, username: user.username };
     res.json({ message: "Login successful" });
-
   } catch (err) {
-    console.error(err); // Log error lebih rinci
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 // Logout endpoint
 app.post("/logout", (req, res) => {
@@ -193,6 +201,5 @@ app.get("/check-session", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
 
 module.exports = app; // Ekspor app agar bisa digunakan oleh Vercel
